@@ -6,7 +6,8 @@ import plotly.express as px
 st.title("GDP Visualization")
 
 # Load the dataset
-df = pd.read_csv(r'Datasets\New folder\GDP_Growth_Individual_Countries.csv', encoding='ISO-8859-1')
+df = pd.read_csv(r'Datasets/New folder/GDP_Growth_Individual_Countries.csv', encoding='ISO-8859-1')
+
 
 # Clean column names and ensure they are treated as strings
 df.columns = df.columns.str.strip().astype(str)
