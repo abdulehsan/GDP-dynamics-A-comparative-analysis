@@ -8,7 +8,7 @@ if page == "Home":
     st.write("Welcome to the GDP Analysis Dashboard!")
 elif page == "Visualization":
     st.write("Navigate to Visualizations")
-    # import pages.visualization
+    import pages.gdp_growth_visualization
 elif page == "Reports":
     st.write("Navigate to Reports")
     # import reports.report
