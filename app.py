@@ -11,4 +11,7 @@ elif page == "Visualization":
     import pages.gdp_growth_visualization
 elif page == "Reports":
     st.write("Navigate to Reports")
+elif page =="Unemployement":
+    st.write("Navigate to Unemployment")
+    import pages.unemployement_rate_visualization
     # import reports.report
