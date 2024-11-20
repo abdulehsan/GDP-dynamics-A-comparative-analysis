@@ -18,11 +18,7 @@ def load_data():
         st.error(f"Dataset file not found at: {file_path}")
         st.stop()  # Stop execution if the file is not found
 
-<<<<<<< HEAD
     # Load the data
-=======
-    # Load the dataset
->>>>>>> unemployment
     data = pd.read_csv(file_path)
     data.rename(columns={
         'Entity': 'Country',
@@ -37,27 +33,17 @@ def load_data():
 
     # Map countries to their respective regions
     region_mapping = {
-<<<<<<< HEAD
         "Algeria": "Africa", "Angola": "Africa", "Benin": "Africa", "Botswana": "Africa",
         # (Rest of the region_mapping here...)
         "United States": "North America", "Argentina": "South America", "Australia": "Oceania"
     }
 
     # Map countries to their respective regions
-=======
-        # Add your complete region mapping here as in your original code
-        "United States": "North America", "Argentina": "South America", "Australia": "Oceania",
-    }
->>>>>>> unemployment
     data['Region'] = data['Country'].map(region_mapping).fillna("Other")
 
     # Fill missing data with regional averages
     data['Observations'].fillna(data.groupby('Region')['Observations'].transform('mean'), inplace=True)
-<<<<<<< HEAD
     data['Observations'].fillna(0, inplace=True)
-=======
-    data['Observations'].fillna(0, inplace=True)  # If no average is available, set to 0
->>>>>>> unemployment
 
     return data, region_mapping
 
