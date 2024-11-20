@@ -2,7 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import requests
+import path
+import sys
 
+dir = path.Path(__file__).abspath()
+sys.path.append(dir.parent.parent)
 # Load the dataset
 @st.cache_data(ttl=60)  # Updated caching method
 def load_data():
