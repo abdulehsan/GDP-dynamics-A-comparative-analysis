@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 from pathlib import Path
+
 # Cache the data loading function for efficiency
 @st.cache_data(ttl=60)
 def load_data():
