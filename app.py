@@ -14,4 +14,8 @@ elif page == "Reports":
 elif page =="Unemployement":
     st.write("Navigate to Unemployment")
     import pages.unemployement_rate_visualization
-    # import reports.report
+elif page == "GDP":
+    st.write("Navigate to GDP Visualizations")
+    # Import your `gdp_visualization.py` page
+    import pages.gdp_visualization
+    
