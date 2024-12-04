@@ -4,20 +4,14 @@ import plotly.express as px
 import streamlit as st
 from pathlib import Path
 
-
-
 file_path = Path(__file__).parent.parent / 'Datasets' / 'New_folder' / 'Cleaned_GDP_Growth.csv'
 gdp_data = pd.read_csv(file_path)
 
 st.title("Interactive GDP Growth Dashboard")
 st.title("Navigation")
-page = st.selectbox("Go to", ["Dashboard","Country Analysis", "Comparison", "Global Insights", "Top/Bottom Performers"])
+page = st.selectbox("Go to", ["Country Analysis", "Comparison", "Global Insights", "Top/Bottom Performers"])
 
-if page == "Dashboard":
-    st.write("Welcome to the GDP Growth Dashboard!")
-    st.write("Select a page from the sidebar to get started.")
-
-elif page == "Global Insights":
+if page == "Global Insights":
     selected_year = st.slider(
         "Select Year", min_value=1960, max_value=2022, value=2022
     )

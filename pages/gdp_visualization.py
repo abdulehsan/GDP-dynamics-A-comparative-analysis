@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats
-
 # Load the dataset
 @st.cache_data
 def load_data():
