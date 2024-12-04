@@ -4,3 +4,4 @@ plotly
 matplotlib
 pycountry
 path
+streamlit-navigation-bar
