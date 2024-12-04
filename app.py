@@ -1,28 +1,25 @@
 import streamlit as st
-
 # Title
+st.set_page_config(initial_sidebar_state="collapsed")
 st.title("Interactive GDP Analysis Dashboard")
-st.sidebar.title("Navigation")
+st.subheader("Navigation")
+page = st.selectbox("Go to", ["Home", "Visualization", "Reports"])
 
-# Sidebar Navigation
-page = st.sidebar.selectbox("Select a page", ["Home", "GDP per Capita", "Visualization", "Reports"])
-
-# Page: Home
 if page == "Home":
     st.write("Welcome to the GDP Analysis Dashboard!")
 
-# Page: GDP per Capita
-elif page == "GDP per Capita":
-    st.subheader("GDP per Capita Analysis")
-    # Import the GDP analysis module from the pages folder
-    from pages.GDP_Per_Capita import show_gdp_per_capita_analysis
-    show_gdp_per_capita_analysis()
-
-# Page: Visualization (placeholder)
 elif page == "Visualization":
-    st.write("Navigate to Visualizations")
+    st.write("Navigate to Visualization")
+    visualization_page = st.selectbox("Select a page", ["GDP", "GDP-Per-Capita","GDP Growth" , "Unemployement"])
+    if visualization_page == "GDP Growth":
+        import pages.gdp_growth_visualization
+    elif visualization_page == "GDP":
+        import pages.gdp_visualization
+    elif visualization_page == "GDP-Per-Capita":
+        import pages.GDP_Per_Capita
+    elif visualization_page == "Unemployement":
+        import pages.unemployement_rate_visualization
 
-# Page: Reports (placeholder)
 elif page == "Reports":
     st.write("Navigate to Reports")
 elif page =="Unemployement":
