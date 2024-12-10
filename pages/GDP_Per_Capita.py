@@ -93,7 +93,7 @@ measures_of_tendency_button = st.sidebar.button("Measures of Tendency")
 
 # Statistical Analysis: Measures of Central Tendency & Dispersion
 if statistical_analysis_button:
-    st.title("Statistical Analysis of GDP per Capita")
+    st.title(f"Statistical Analysis of GDP per Capita for year {st.session_state.selected_year}")
     
     # Extract the relevant data for the selected year
     selected_year_data = cleaned_data[selected_year_str].dropna()
@@ -119,6 +119,43 @@ if statistical_analysis_button:
     st.write(f"**Variance**: {variance_value:,.2f}")
     st.write(f"**Standard Deviation**: {std_deviation_value:,.2f}")
     st.write(f"**Interquartile Range (IQR)**: {iqr_value:,.2f}")
+    st.title("Time Series Statistical Analysis of GDP per Capita")
+
+    # Time series analysis for three periods
+    periods = [(1990, 2000), (2001, 2010), (2011, 2023)]
+    
+    for period_start, period_end in periods:
+        # Extract the relevant data for the period (years in the given range)
+        period_years = [str(year) for year in range(period_start, period_end + 1)]
+        period_data = cleaned_data[period_years].dropna(axis=1, how='all')  # Drop any columns that are fully NaN
+        
+        # Perform the statistical analysis for this period
+        st.subheader(f"Time Series Analysis of GDP per Capita for Years {period_start} to {period_end}")
+
+        # Measures of Central Tendency (Mean, Median, Mode)
+        mean_value = period_data.mean().mean()  # Mean across all countries and years
+        median_value = period_data.median().median()  # Median across all countries and years
+        mode_value = period_data.mode().iloc[0].mean()  # Taking the first mode across all countries and years
+
+        # Measures of Dispersion (Range, Variance, Standard Deviation, IQR)
+        range_value = period_data.max().max() - period_data.min().min()  # Range across all countries and years
+        variance_value = period_data.var().mean()  # Variance across all countries and years
+        std_deviation_value = period_data.std().mean()  # Standard deviation across all countries and years
+        iqr_value = period_data.quantile(0.75).mean() - period_data.quantile(0.25).mean()  # IQR across all countries and years
+
+        # Display Measures of Central Tendency
+        st.write(f"**Mean GDP per Capita**: {mean_value:,.2f}")
+        st.write(f"**Median GDP per Capita**: {median_value:,.2f}")
+        st.write(f"**Mode GDP per Capita**: {mode_value:,.2f}")
+
+        # Display Measures of Dispersion
+        st.write(f"**Range of GDP per Capita**: {range_value:,.2f}")
+        st.write(f"**Variance of GDP per Capita**: {variance_value:,.2f}")
+        st.write(f"**Standard Deviation of GDP per Capita**: {std_deviation_value:,.2f}")
+        st.write(f"**Interquartile Range (IQR) of GDP per Capita**: {iqr_value:,.2f}")
+
+        # Add space between periods for readability
+        st.markdown("---")
 
 # Measures of Tendency (Skewness & Kurtosis)
 # Measures of Tendency (Skewness & Kurtosis) with Line Graph
@@ -223,6 +260,32 @@ if graphical_analysis_button:
                                 title=f"Comparison of Selected Countries' GDP per Capita with World Median ({st.session_state.selected_year})")
         st.plotly_chart(fig_comparison)
 
+    # **Time Series Graphical Analysis - Additional Section**
+        st.title("Time Series Analysis of GDP per Capita")
+
+    # Time series analysis for three periods
+    periods = [(1990, 2000), (2001, 2010), (2011, 2023)]
+
+    for period_start, period_end in periods:
+        # Extract the relevant data for the period (years in the given range)
+        period_years = [str(year) for year in range(period_start, period_end + 1)]
+        period_data = cleaned_data[period_years].dropna(axis=1, how='all')  # Drop any columns that are fully NaN
+    
+        # Calculate the mean GDP per capita across all countries for each year in the period
+        mean_gdp_per_year = period_data.mean(axis=0)  # Get the mean GDP for each year across all countries
+     
+        # Convert the Series to a DataFrame for plotting
+        mean_gdp_df = mean_gdp_per_year.reset_index()
+        mean_gdp_df.columns = ['Year', 'Mean GDP per Capita']  # Rename columns
+    
+        # **Line Chart for Time Series Trends in the Given Period**
+        st.subheader(f"GDP per Capita Trends for {period_start} to {period_end}")
+    
+        # Plot the mean GDP per capita for the given period
+        fig_line_period = px.line(mean_gdp_df, x="Year", y="Mean GDP per Capita", 
+                                title=f"Mean GDP per Capita for {period_start} to {period_end}",
+                                labels={"Year": "Year", "Mean GDP per Capita": "GDP per Capita (USD)"})
+        st.plotly_chart(fig_line_period)
 
 if show_gdp_info:
     st.title("What is GDP per Capita?")
