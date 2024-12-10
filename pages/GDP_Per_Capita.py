@@ -86,16 +86,191 @@ if selected_year_str not in cleaned_data.columns:
 world_median_gdp = cleaned_data[selected_year_str].median()
 
 # Sidebar Buttons
-statistical_analysis_button = st.sidebar.button("Statistical Analysis")
-graphical_analysis_button = st.sidebar.button("Graphical Analysis")
 show_gdp_info = st.sidebar.button("GDP per Capita")
+graphical_analysis_button = st.sidebar.button("Graphical Analysis")
+statistical_analysis_button = st.sidebar.button("Statistical Analysis")
 measures_of_tendency_button = st.sidebar.button("Measures of Tendency")
 
+# Statistical Analysis: Measures of Central Tendency & Dispersion
+if statistical_analysis_button:
+    st.title("Statistical Analysis of GDP per Capita")
+    
+    # Extract the relevant data for the selected year
+    selected_year_data = cleaned_data[selected_year_str].dropna()
+
+    # Measures of Central Tendency
+    mean_value = selected_year_data.mean()
+    median_value = selected_year_data.median()
+    mode_value = selected_year_data.mode()[0]  # Taking the first mode value
+
+    # Measures of Dispersion
+    range_value = selected_year_data.max() - selected_year_data.min()
+    variance_value = selected_year_data.var()
+    std_deviation_value = selected_year_data.std()
+    iqr_value = selected_year_data.quantile(0.75) - selected_year_data.quantile(0.25)
+
+    st.subheader("Measures of Central Tendency")
+    st.write(f"**Mean**: {mean_value:,.2f}")
+    st.write(f"**Median**: {median_value:,.2f}")
+    st.write(f"**Mode**: {mode_value:,.2f}")
+
+    st.subheader("Measures of Dispersion")
+    st.write(f"**Range**: {range_value:,.2f}")
+    st.write(f"**Variance**: {variance_value:,.2f}")
+    st.write(f"**Standard Deviation**: {std_deviation_value:,.2f}")
+    st.write(f"**Interquartile Range (IQR)**: {iqr_value:,.2f}")
+
+# Measures of Tendency (Skewness & Kurtosis)
 # Measures of Tendency (Skewness & Kurtosis) with Line Graph
+# Measures of Tendency (Skewness & Kurtosis) with Line Graph
+# Measures of Tendency (Skewness & Kurtosis) with Line Graph
+if graphical_analysis_button:
+    st.title("Graphical Analysis of GDP per Capita")
+    
+    # Extract the relevant data based on whether "All" or specific countries are selected
+    if "All" in st.session_state.selected_countries:
+        year_data = cleaned_data[['Country', str(st.session_state.selected_year)]].dropna()
+        # Show the full dataset if 'All' is selected
+        st.write("### Showing Data for All Countries")
+        
+        # **Line Chart for All Countries**
+        st.subheader(f"GDP per Capita Trends Over Time for All Countries")
+        all_countries_data = cleaned_data[['Country'] + [str(year) for year in range(1990, 2024)]]
+        all_countries_data = all_countries_data.melt(id_vars=["Country"], 
+                                                     value_vars=[str(year) for year in range(1990, 2024)], 
+                                                     var_name="Year", 
+                                                     value_name="GDP per Capita")
+        
+        fig_line_all = px.line(all_countries_data, x="Year", y="GDP per Capita", color="Country",
+                               title=f"GDP per Capita Trends Over Time for All Countries ({st.session_state.selected_year})",
+                               labels={"GDP per Capita": "GDP per Capita (USD)", "Year": "Year"})
+        st.plotly_chart(fig_line_all)
+
+    else:
+        year_data = cleaned_data[cleaned_data['Country'].isin(st.session_state.selected_countries)]
+        year_data = year_data[['Country', str(st.session_state.selected_year)]].dropna()
+        st.write(f"### Showing Data for Selected Countries: {', '.join(st.session_state.selected_countries)}")
+
+    # Histogram of GDP per Capita for the selected year
+    st.subheader(f"Histogram of GDP per Capita for {st.session_state.selected_year}")
+    fig_hist = px.histogram(year_data, x=str(st.session_state.selected_year), nbins=20, title=f"GDP per Capita Distribution ({st.session_state.selected_year})")
+    st.plotly_chart(fig_hist)
+
+    # Line Chart for GDP per Capita Trends Over Time (for selected countries)
+    # st.subheader(f"GDP per Capita Trends Over Time for Selected Countries")
+    selected_countries_data = cleaned_data[cleaned_data['Country'].isin(st.session_state.selected_countries)]
+
+    # Reshaping the data for line chart
+    line_chart_data = selected_countries_data.melt(id_vars=["Country"], 
+                                                   value_vars=[str(year) for year in range(1990, 2024)], 
+                                                   var_name="Year", 
+                                                   value_name="GDP per Capita")
+
+    # Filter data for the selected countries and the year range
+    # line_chart_data = line_chart_data[line_chart_data['Country'].isin(st.session_state.selected_countries)]
+
+    # Plotting the Line Chart (for selected countries)
+    # fig_line = px.line(line_chart_data, x="Year", y="GDP per Capita", color="Country",
+                    #    title=f"GDP per Capita Trends Over Time for Selected Countries",
+                    #    labels={"GDP per Capita": "GDP per Capita (USD)", "Year": "Year"})
+    # st.plotly_chart(fig_line)
+
+    # **Bar Graph**: Top 10 Countries by GDP per Capita (only if "All" countries are selected)
+    if "All" in st.session_state.selected_countries:
+        top_10_gdp = year_data.sort_values(by=str(st.session_state.selected_year), ascending=False).head(10)
+        st.subheader(f"Top 10 Countries by GDP per Capita in {st.session_state.selected_year}")
+        fig_bar = px.bar(top_10_gdp, x='Country', y=str(st.session_state.selected_year), title=f"Top 10 Countries by GDP per Capita ({st.session_state.selected_year})")
+        st.plotly_chart(fig_bar)
+
+    # Pie Chart: GDP Distribution among Countries
+    st.subheader(f"Pie Chart of GDP Distribution in {st.session_state.selected_year}")
+    fig_pie = px.pie(year_data, names='Country', values=str(st.session_state.selected_year), title=f"GDP Distribution by Country in {st.session_state.selected_year}")
+    st.plotly_chart(fig_pie)
+
+    # Box Plot: GDP per Capita Distribution
+    st.subheader(f"Box Plot of GDP per Capita for {st.session_state.selected_year}")
+    fig_box = px.box(year_data, y=str(st.session_state.selected_year), title=f"Box Plot of GDP per Capita ({st.session_state.selected_year})")
+    st.plotly_chart(fig_box)
+
+    # Scatter Plot: Country vs GDP per Capita
+    st.subheader(f"Scatter Plot of Country vs GDP per Capita in {st.session_state.selected_year}")
+    fig_scatter = px.scatter(year_data, x='Country', y=str(st.session_state.selected_year), title=f"Country vs GDP per Capita ({st.session_state.selected_year})")
+    st.plotly_chart(fig_scatter)
+
+    # Display the GDP per Capita insights and analysis for the selected year
+    st.subheader(f"GDP per Capita Insights for {st.session_state.selected_year}")
+    year_filtered_data = (
+        year_data.rename(columns={str(st.session_state.selected_year): 'GDP per Capita'})
+        .dropna(subset=['GDP per Capita'])
+    )
+
+    # Display the average GDP per Capita
+    average_gdp = year_filtered_data['GDP per Capita'].mean()
+    st.write(f"### Average GDP per Capita in {st.session_state.selected_year}: ${average_gdp:,.2f}")
+
+    # Display world median GDP per Capita (only for specific countries)
+    if "All" not in st.session_state.selected_countries:
+        world_median_gdp = cleaned_data[str(st.session_state.selected_year)].median()
+        st.write(f"### World Median GDP per Capita for {st.session_state.selected_year}: ${world_median_gdp:,.2f}")
+
+        # Visualize comparison between selected countries and world median
+        comparison_data = year_filtered_data[['Country', 'GDP per Capita']].copy()
+        comparison_data['World Median'] = world_median_gdp
+        comparison_data = comparison_data.melt(id_vars=["Country"], value_vars=["GDP per Capita", "World Median"], 
+                                               var_name="Metric", value_name="Value")
+
+        fig_comparison = px.bar(comparison_data, x='Country', y='Value', color='Metric', 
+                                title=f"Comparison of Selected Countries' GDP per Capita with World Median ({st.session_state.selected_year})")
+        st.plotly_chart(fig_comparison)
+
+
+if show_gdp_info:
+    st.title("What is GDP per Capita?")
+    st.subheader("Definition")
+    st.write("""
+        **GDP per Capita** is a metric used to measure the economic output (Gross Domestic Product) per person in a given country. 
+        It is calculated by dividing the country's GDP by its population.
+    """)
+
+    st.subheader("Why is it Important?")
+    st.write("""
+        GDP per capita is important because it allows for a comparison of the standard of living between countries or over time. 
+        It provides a snapshot of the economic health of a country and is often used to compare the prosperity of nations.
+    """)
+
+    st.subheader("Formula")
+    st.write("""
+        The formula for calculating GDP per Capita is:
+        
+        **GDP per Capita** = **GDP** ÷ **Population**
+        
+        Where:
+        - **GDP** is the total value of goods and services produced by a country within a year.
+        - **Population** is the total number of people in that country.
+    """)
+
+    st.subheader("Example Calculation")
+    st.write("""
+        Let’s take the example of Country A:
+        
+        - GDP of Country A = \$1,000,000,000 (1 billion dollars)
+        - Population of Country A = 50,000 people
+        
+        Using the formula:
+        
+        **GDP per Capita** = 1,000,000,000 ÷ 50,000 = **\$20,000**
+        
+        This means the average economic output per person in Country A is \$20,000.
+    """)
+
+    st.subheader("Visualizing GDP per Capita")
+    st.write("""
+        By analyzing GDP per capita, we can observe which countries are wealthier and which are struggling economically. This can help governments, businesses, and policymakers make informed decisions about investments, development strategies, and economic policies.""")
+        
 if measures_of_tendency_button:
     st.title("Measures of Tendency")
 
-    # Extract the relevant data for the selected countries (all countries if 'All' is selected)
+    # Extract the relevant data for the selected countries (use all countries if "All" is selected)
     if "All" in st.session_state.selected_countries:
         selected_countries_data = cleaned_data  # Use all data when "All" is selected
     else:
@@ -123,7 +298,7 @@ if measures_of_tendency_button:
         skewness_bowley = (Q3 + Q1 - 2 * Q2) / (Q3 - Q1)
         kurtosis_value = year_data.kurtosis()  # Pearson’s method
 
-        # Store the results
+        # Store the results for plotting
         kurtosis_values.append(kurtosis_value)
 
     # Create a DataFrame for plotting skewness and kurtosis over time
@@ -177,85 +352,85 @@ if measures_of_tendency_button:
     """)
 
 
-else:
-    # If the "GDP per Capita" button is not clicked, show the rest of the content
-    # Insights and GDP per Capita Section
-    st.title("GDP per Capita Analysis")
+# else:
+#     # If the "GDP per Capita" button is not clicked, show the rest of the content
+#     # Insights and GDP per Capita Section
+#     st.title("GDP per Capita Analysis")
 
-    # Insights based on selected year
-    st.subheader(f"GDP per Capita Insights for {st.session_state.selected_year}")
-    year_filtered_data = (
-        filtered_data[['Country', 'ISO_Code', str(st.session_state.selected_year)]]
-        .rename(columns={str(st.session_state.selected_year): 'GDP per Capita'})
-        .dropna(subset=['ISO_Code', 'GDP per Capita'])
-    )
+#     # Insights based on selected year
+#     st.subheader(f"GDP per Capita Insights for {st.session_state.selected_year}")
+#     year_filtered_data = (
+#         filtered_data[['Country', 'ISO_Code', str(st.session_state.selected_year)]]
+#         .rename(columns={str(st.session_state.selected_year): 'GDP per Capita'})
+#         .dropna(subset=['ISO_Code', 'GDP per Capita'])
+#     )
 
-    # Display top 10 countries with the highest GDP per capita only when "All" is selected
-    if "All" in st.session_state.selected_countries:
-        top_gdp = year_filtered_data.sort_values(by='GDP per Capita', ascending=False).head(10)
-        st.write("### Top 10 Countries by GDP per Capita")
-        st.write(top_gdp[['Country', 'GDP per Capita']])
+#     # Display top 10 countries with the highest GDP per capita only when "All" is selected
+#     if "All" in st.session_state.selected_countries:
+#         top_gdp = year_filtered_data.sort_values(by='GDP per Capita', ascending=False).head(10)
+#         st.write("### Top 10 Countries by GDP per Capita")
+#         st.write(top_gdp[['Country', 'GDP per Capita']])
 
-    # Average GDP per Capita
-    average_gdp = year_filtered_data['GDP per Capita'].mean()
-    st.write(f"### Average GDP per Capita in {st.session_state.selected_year}: ${average_gdp:,.2f}")
+#     # Average GDP per Capita
+#     average_gdp = year_filtered_data['GDP per Capita'].mean()
+#     st.write(f"### Average GDP per Capita in {st.session_state.selected_year}: ${average_gdp:,.2f}")
 
-    # World Median Comparison (Only when specific countries are selected)
-    if "All" not in st.session_state.selected_countries:
-        # Add world median as a comparison
-        st.write(f"### World Median GDP per Capita for {st.session_state.selected_year}: ${world_median_gdp:,.2f}")
+#     # World Median Comparison (Only when specific countries are selected)
+#     if "All" not in st.session_state.selected_countries:
+#         # Add world median as a comparison
+#         st.write(f"### World Median GDP per Capita for {st.session_state.selected_year}: ${world_median_gdp:,.2f}")
 
-        # Visualize comparison between selected countries and world median
-        comparison_data = year_filtered_data[['Country', 'GDP per Capita']].copy()
-        comparison_data['World Median'] = world_median_gdp
-        comparison_data = comparison_data.melt(id_vars=["Country"], value_vars=["GDP per Capita", "World Median"], 
-                                               var_name="Metric", value_name="Value")
+#         # Visualize comparison between selected countries and world median
+#         comparison_data = year_filtered_data[['Country', 'GDP per Capita']].copy()
+#         comparison_data['World Median'] = world_median_gdp
+#         comparison_data = comparison_data.melt(id_vars=["Country"], value_vars=["GDP per Capita", "World Median"], 
+#                                                var_name="Metric", value_name="Value")
 
-        fig_comparison = px.bar(comparison_data, x='Country', y='Value', color='Metric', 
-                                title=f"Comparison of Selected Countries' GDP per Capita with World Median ({st.session_state.selected_year})")
-        st.plotly_chart(fig_comparison)
+#         fig_comparison = px.bar(comparison_data, x='Country', y='Value', color='Metric', 
+#                                 title=f"Comparison of Selected Countries' GDP per Capita with World Median ({st.session_state.selected_year})")
+#         st.plotly_chart(fig_comparison)
 
-    # Visualization: Choropleth Map
-    st.subheader(f"GDP per Capita Global Map ({st.session_state.selected_year})")
-    fig_map = px.choropleth(
-        year_filtered_data,
-        locations="ISO_Code",
-        color="GDP per Capita",
-        hover_name="Country",
-        title=f"Global GDP per Capita in {st.session_state.selected_year}",
-        color_continuous_scale=px.colors.sequential.Plasma,
-        labels={"GDP per Capita": "GDP per Capita (USD)"}
-    )
-    st.plotly_chart(fig_map)
+#     # Visualization: Choropleth Map
+#     st.subheader(f"GDP per Capita Global Map ({st.session_state.selected_year})")
+#     fig_map = px.choropleth(
+#         year_filtered_data,
+#         locations="ISO_Code",
+#         color="GDP per Capita",
+#         hover_name="Country",
+#         title=f"Global GDP per Capita in {st.session_state.selected_year}",
+#         color_continuous_scale=px.colors.sequential.Plasma,
+#         labels={"GDP per Capita": "GDP per Capita (USD)"}
+#     )
+#     st.plotly_chart(fig_map)
 
-    # Visualization: GDP Distribution (Histogram)
-    st.subheader(f"GDP per Capita Distribution in {st.session_state.selected_year}")
+#     # Visualization: GDP Distribution (Histogram)
+#     st.subheader(f"GDP per Capita Distribution in {st.session_state.selected_year}")
     
-    # Dynamically adjust bins and range of histogram based on number of countries selected
-    num_bins = 20 if len(st.session_state.selected_countries) < 10 else 10  # Adjust number of bins based on selection size
-    fig_histogram = px.histogram(year_filtered_data, x="GDP per Capita", nbins=num_bins, title=f"GDP per Capita Distribution ({st.session_state.selected_year})")
-    fig_histogram.update_layout(xaxis_title="GDP per Capita (USD)", yaxis_title="Frequency")
-    st.plotly_chart(fig_histogram)
+#     # Dynamically adjust bins and range of histogram based on number of countries selected
+#     num_bins = 20 if len(st.session_state.selected_countries) < 10 else 10  # Adjust number of bins based on selection size
+#     fig_histogram = px.histogram(year_filtered_data, x="GDP per Capita", nbins=num_bins, title=f"GDP per Capita Distribution ({st.session_state.selected_year})")
+#     fig_histogram.update_layout(xaxis_title="GDP per Capita (USD)", yaxis_title="Frequency")
+#     st.plotly_chart(fig_histogram)
 
-    # Line Chart: GDP per Capita trends over time for selected countries
-    st.subheader(f"GDP per Capita Trends Over Time for Selected Countries")
-    selected_countries_data = cleaned_data[cleaned_data['Country'].isin(st.session_state.selected_countries)]
+#     # Line Chart: GDP per Capita trends over time for selected countries
+#     st.subheader(f"GDP per Capita Trends Over Time for Selected Countries")
+#     selected_countries_data = cleaned_data[cleaned_data['Country'].isin(st.session_state.selected_countries)]
 
-    # Reshaping the data for line chart
-    line_chart_data = selected_countries_data.melt(id_vars=["Country"], 
-                                                   value_vars=[str(year) for year in range(1990, 2024)], 
-                                                   var_name="Year", 
-                                                   value_name="GDP per Capita")
+#     # Reshaping the data for line chart
+#     line_chart_data = selected_countries_data.melt(id_vars=["Country"], 
+#                                                    value_vars=[str(year) for year in range(1990, 2024)], 
+#                                                    var_name="Year", 
+#                                                    value_name="GDP per Capita")
 
-    # Filter data for the selected countries and the year range
-    line_chart_data = line_chart_data[line_chart_data['Country'].isin(st.session_state.selected_countries)]
+#     # Filter data for the selected countries and the year range
+#     line_chart_data = line_chart_data[line_chart_data['Country'].isin(st.session_state.selected_countries)]
 
-    # Plotting the Line Chart
-    fig_line = px.line(line_chart_data, x="Year", y="GDP per Capita", color="Country",
-                       title=f"GDP per Capita Trends Over Time for Selected Countries",
-                       labels={"GDP per Capita": "GDP per Capita (USD)", "Year": "Year"})
-    st.plotly_chart(fig_line)
+#     # Plotting the Line Chart
+#     fig_line = px.line(line_chart_data, x="Year", y="GDP per Capita", color="Country",
+#                        title=f"GDP per Capita Trends Over Time for Selected Countries",
+#                        labels={"GDP per Capita": "GDP per Capita (USD)", "Year": "Year"})
+#     st.plotly_chart(fig_line)
 
-    # Footer
-    st.markdown("**Data Source:** Provided CSV File")
+#     # Footer
+#     st.markdown("**Data Source:** Provided CSV File")
 
