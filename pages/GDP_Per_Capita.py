@@ -5,7 +5,7 @@ import numpy as np
 from pathlib import Path
 
 # File path for your dataset
-file_path = Path('Datasets') / 'New folder' / 'Cleaned_GDP_Per_Capita.csv'
+file_path = Path(__file__).parent.parent / 'Datasets' / 'New folder' / 'Cleaned_GDP_Per_Capita.csv'
 
 # Load the dataset
 @st.cache_data(ttl=60)  # Updated caching method

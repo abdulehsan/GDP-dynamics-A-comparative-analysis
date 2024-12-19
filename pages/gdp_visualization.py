@@ -3,10 +3,11 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats
-# Load the dataset
+from pathlib import Path
+
 @st.cache_data
 def load_data():
-    file_path = './Datasets/New_folder/GDP_1960_to_2022.csv'  # Adjust this path as needed
+    file_path = Path(__file__).parent.parent / 'Datasets' / 'New_folder' / 'GDP_1960_to_2022.csv'#'./Datasets/New_folder/GDP_1960_to_2022.csv'  # Adjust this path as needed
     data = pd.read_csv(file_path)
     data_long = data.melt(
         id_vars=["Country", "Country Code"],
@@ -15,7 +16,7 @@ def load_data():
     )
     data_long["Year"] = pd.to_numeric(data_long["Year"], errors="coerce")
     data_long["GDP"] = pd.to_numeric(data_long["GDP"], errors="coerce")
-    # Remove aggregate and non-country entries
+
     exclude_list = [
         "World", "High income", "Low income", "OECD members", "Post-demographic dividend",
         "IDA & IBRD total", "IDA total", "IBRD only", "Middle income", "Upper middle income",
@@ -24,10 +25,8 @@ def load_data():
     data_long = data_long[~data_long["Country"].isin(exclude_list)]
     return data_long.dropna(subset=["GDP"])
 
-# Load and cache data
 gdp_data = load_data()
 
-# Sidebar Features
 st.sidebar.title("Navigation")
 menu = st.sidebar.radio(
     "Go to",
@@ -39,7 +38,6 @@ selected_year = st.sidebar.slider("Select Year", min_value=int(gdp_data["Year"].
 global_gdp_year = gdp_data[gdp_data["Year"] == selected_year]["GDP"].sum()
 top_country_data = gdp_data[gdp_data["Year"] == selected_year].sort_values(by="GDP", ascending=False).iloc[0]
 
-# Apply custom CSS for smaller metrics in sidebar
 st.sidebar.markdown(
     """
     <style>
